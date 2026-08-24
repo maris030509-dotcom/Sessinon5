@@ -1,5 +1,10 @@
 Rails.application.routes.draw do
-  resources :users, only: [:new, :create, :index, :show, :edit, :update] , path: 'users', path_names: { new: 'sign_up' }
+  resources :users, only: [:new, :create, :index, :show, :edit, :update] , path: 'users', path_names: { new: 'sign_up' } do
+    resources :relationships, only: [:create, :destroy]
+  	get "followings" => "relationships#followings", as: "followings"
+  	get "followers" => "relationships#followers", as: "followers"
+  end
+
   resources :books, only: [:new, :create, :index, :show, :edit, :update, :destroy]
   resource :session
   resources :passwords, param: :token
