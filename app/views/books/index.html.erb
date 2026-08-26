@@ -43,20 +43,8 @@
                 <%= book.body %></p>
               </td>
               
-            <% if book.favorited_by?(Current.user) %>
-              <td class="fw-bolder p-2">
-                <%= link_to book_favorite_path(book), data: { turbo_method: :delete } do %>
-                  ♥<%= book.favorites.count %> いいね
-                <% end %>
-              </td>
-            <% else %>
-              <td class="fw-bolder p-2">
-                <%= link_to book_favorite_path(book), data: { turbo_method: "post" } do %>
-                  ♡<%= book.favorites.count %> いいね
-                <% end %>
-              </td>
-            <% end %>
-
+              <td id="favorite_btn_<%= book.id %>">
+                <%= render "favorites/favorite_btn", book: book %>
               <td>
                 コメント数：<%= book.book_comments.count %>
               </td>

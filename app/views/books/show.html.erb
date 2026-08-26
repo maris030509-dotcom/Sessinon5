@@ -21,7 +21,7 @@
         <td class="fw-bolder p-2">
           <%= link_to user_path(@book.user), class: "d-flex flex-column align-items-center text-decoration-none link-underline" do %>
 
-            <%= image_tag @book.user.get_profile_image(100,100) %>
+            <%= image_tag @book.user.get_profile_image(80,80) %>
 
             <span class="fw-bold"><%= @book.user.name %></span>
 
@@ -35,21 +35,11 @@
         <td colspan="3" class="fw-bolder p-2 w-50">
           <%= @book.body %>
         </td>
-
-        <% if @book.favorited_by?(Current.user) %>
-          <td class="fw-bolder p-2">
-            <%= link_to book_favorite_path(@book), data: { turbo_method: :delete } do %>
-              ♥<%= @book.favorites.count %> いいね
-            <% end %>
-          </td>
-        <% else %>
-          <td class="fw-bolder p-2">
-            <%= link_to book_favorite_path(book), data: { turbo_method: "post" } do %>
-              ♡<%= @book.favorites.count %> いいね
-            <% end %>
-          </td>
-        <% end %>
-
+        <td>
+          <%= turbo_frame_tag dom_id(@book, :favorite) do %>
+            <%= render 'favorites/favorite_btn', book: @book %>
+          <% end %>
+        </td>
         <td>
           コメント数：<%= @book.book_comments.count %>
         </td>
@@ -66,39 +56,23 @@
     </tbody>
   </table>
 
-  <table class="table bg-white">
-    <thead>
-      <tr class="border-top border-bottom">
-        <th class="fw-bolder p-2"></th>
-          <th class="fw-bolder p-2"></th>
-          <th class="fw-bolder p-2"></th>
-        </tr>
-    </thead>
-
-    <tbody>
-      <% @book.book_comments.each do |book_comment| %>
+  <%= turbo_frame_tag dom_id(@book, :comments) do %>
+    <table class="table bg-white">
+      <thead>
         <tr class="border-top border-bottom">
-          <td class="fw-bolder p-2">
-            <%= link_to user_path(book_comment.user) do %>
-              <%= image_tag book_comment.user.get_profile_image(80,80) %>
-            <% end %>
-          </td>
-
-          <td class="fw-bolder p-2">
-            <%= book_comment.comment %>
-          </td>
-
-          <% if book_comment.user == current_user %>
-          <td>
-            <%= link_to "Destroy", book_book_comment_path(@book, book_comment), method: :delete, data: { turbo_method: :delete, turbo_confirm: "本当に消しますか？"}, class: "btn", style: "background-color: #ff0000; color: white;" %>
-          </td>
-          <% end %>
-              
+          <th class="fw-bolder p-2"></th>
+          <th class="fw-bolder p-2"></th>
+          <th class="fw-bolder p-2"></th>
         </tr>
-      <% end %>
-    </tbody>
-  </table> 
-  <%= form_with model: [@book, BookComment.new], local: true do |f| %>
+      </thead>
+
+      <tbody>
+        <%= render "book_comments/index", book: @book %>
+      </tbody>
+    </table>
+  <% end %>
+
+  <%= form_with model: [@book, BookComment.new] do |f| %>
     <div class="field">
       <%= f.text_area :comment, autofocus: true %>
     </div>
